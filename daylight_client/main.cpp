@@ -15,6 +15,8 @@
 
 using boost::asio::ip::tcp;
 
+
+
 int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de ejemplo
 {
     //std::ifstream prueba("prueba.txt");//adaptar para el tipo de archivo que se busque
@@ -33,15 +35,19 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
             std::cerr << "Usage: cliente <host/path/filename>" << std::endl;
             return 1;
         }
-
-        boost::asio::io_context io_context;
-
-        tcp::resolver resolver(io_context);
-        tcp::resolver::results_type endpoints =
-            resolver.resolve(argv[1],"daytime");//"daytime"
-
-        tcp::socket socket(io_context);
-        boost::asio::connect(socket, endpoints);
+        //despues sortear el argc
+        std::string host="127.0.0.1";
+            int port=80;
+            std::string message="daytime";
+        //
+        boost::asio::io_service ios;
+        boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
+        boost::asio::ip::tcp::socket socket(ios);
+        socket.connect(endpoint);
+        boost::array<char, 128> buf;
+        std::copy(message.begin(), message.end(), buf.begin());
+        boost::system::error_code error;
+        socket.write_some(boost::asio::buffer(buf, message.size()), error);
 
         std::ofstream prueba;//abro/creo si no esta/ el archivo para poner lo que reciba del server
         prueba.open("prueba.txt", std::ios::trunc);//borro lo que habia antes
@@ -62,6 +68,7 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
             prueba.write(buf.data(), len);//guardo en el archivo
         }
         prueba.close();
+        socket.close();
     }
     catch (std::exception& e)
     {
@@ -70,32 +77,3 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
 
     return 0;
 }
-
-
-//#include <boost/asio.hpp>
-//#include <boost/array.hpp>
-//#include <iostream>
-//
-//
-//void send_something(std::string host, int port, std::string message)
-//{
-//    boost::asio::io_service ios;
-//
-//    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
-//
-//    boost::asio::ip::tcp::socket socket(ios);
-//
-//    socket.connect(endpoint);
-//
-//    boost::array<char, 128> buf;
-//    std::copy(message.begin(), message.end(), buf.begin());
-//    boost::system::error_code error;
-//    socket.write_some(boost::asio::buffer(buf, message.size()), error);
-//    socket.close();
-//}
-//
-//int main()
-//{
-//    send_something("127.0.0.1",80, "hello flowers team");
-//    return 0;
-//}
