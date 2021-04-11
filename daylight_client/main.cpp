@@ -9,12 +9,13 @@
 //
 
 #include <iostream>
+#include<fstream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de ejemplo
 {
     try
     {
@@ -33,6 +34,9 @@ int main(int argc, char* argv[])
         tcp::socket socket(io_context);
         boost::asio::connect(socket, endpoints);
 
+        std::ofstream prueba;//abro/creo si no esta/ el archivo para poner lo que reciba del server
+        prueba.open("prueba.txt", std::ios::trunc);//borro lo que habia antes
+
         for (;;)
         {
             boost::array<char, 128> buf;
@@ -46,7 +50,9 @@ int main(int argc, char* argv[])
                 throw boost::system::system_error(error); // Some other error.
 
             std::cout.write(buf.data(), len);
+            prueba.write(buf.data(), len);//guardo en el archivo
         }
+        prueba.close();
     }
     catch (std::exception& e)
     {
