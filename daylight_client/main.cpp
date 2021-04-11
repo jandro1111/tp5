@@ -26,7 +26,7 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
     //else {
     //    std::cout << "404 not found";
     //}
-
+    
 
     try
     {
@@ -36,9 +36,25 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
             return 1;
         }
         //despues sortear el argc
-        std::string host="127.0.0.1";
-            int port=80;
-            std::string message="daytime";
+        std::string host = "";
+    int port = 80;
+    std::string message = "";
+    bool barra = false;
+    for (int i = 0; argv[1][i] != NULL; ++i) {
+        if ((argv[1][i] == '/')&& barra==false ) {
+            message += "/";
+            barra = true;
+        }
+        else {
+            if (!barra) {
+                host += argv[1][i];
+            }
+            else {
+                message += argv[1][i];
+            }
+        }
+
+    }
         //
         boost::asio::io_service ios;
         boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
@@ -74,6 +90,8 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
     {
         std::cerr << e.what() << std::endl;
     }
+    
 
+    
     return 0;
 }
