@@ -17,11 +17,20 @@ using boost::asio::ip::tcp;
 
 int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de ejemplo
 {
+    //std::ifstream prueba("prueba.txt");//adaptar para el tipo de archivo que se busque
+    //if (prueba.is_open()) {
+    //    std::cout << "200 ok";
+    //}
+    //else {
+    //    std::cout << "404 not found";
+    //}
+
+
     try
     {
         if (argc != 2)
         {
-            std::cerr << "Usage: client <host>" << std::endl;
+            std::cerr << "Usage: cliente <host/path/filename>" << std::endl;
             return 1;
         }
 
@@ -29,7 +38,7 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
 
         tcp::resolver resolver(io_context);
         tcp::resolver::results_type endpoints =
-            resolver.resolve(argv[1], "daytime");//"daytime"
+            resolver.resolve(argv[1],"daytime");//"daytime"
 
         tcp::socket socket(io_context);
         boost::asio::connect(socket, endpoints);
@@ -61,3 +70,32 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
 
     return 0;
 }
+
+
+//#include <boost/asio.hpp>
+//#include <boost/array.hpp>
+//#include <iostream>
+//
+//
+//void send_something(std::string host, int port, std::string message)
+//{
+//    boost::asio::io_service ios;
+//
+//    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
+//
+//    boost::asio::ip::tcp::socket socket(ios);
+//
+//    socket.connect(endpoint);
+//
+//    boost::array<char, 128> buf;
+//    std::copy(message.begin(), message.end(), buf.begin());
+//    boost::system::error_code error;
+//    socket.write_some(boost::asio::buffer(buf, message.size()), error);
+//    socket.close();
+//}
+//
+//int main()
+//{
+//    send_something("127.0.0.1",80, "hello flowers team");
+//    return 0;
+//}
