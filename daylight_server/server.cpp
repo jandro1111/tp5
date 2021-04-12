@@ -52,7 +52,7 @@ void AsyncDaytimeServer::start_answering()
 {
 	std::cout << "start_answering()" << std::endl;
 	msg = make_daytime_string();
-	boost::asio::async_write(
+	boost::asio::async_write(//make_daytime_string()
 		socket_,
 		boost::asio::buffer(msg),
 		boost::bind(

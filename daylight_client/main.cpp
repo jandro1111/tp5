@@ -12,81 +12,109 @@
 #include<fstream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
+#include<curl/curl.h>
 using boost::asio::ip::tcp;
+//
+struct MemoryStruct {
+    char* memory;
+    size_t size;
+};
 
-
-int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de ejemplo
+static size_t
+WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
-    try
-    {
-        if (argc != 2)
-        {
-            std::cerr << "Usage: cliente <host/path/filename>" << std::endl;
-            return 1;
-        }
-        //despues sortear el argc
-        std::string host = "";
-    int port = 80;
-    std::string message = "GET ";
-    bool barra = false;
-    for (int i = 0; argv[1][i] != NULL; ++i) {
-        if ((argv[1][i] == '/')&& barra==false ) {
-            barra = true;
-        }
-        else {
-            if (!barra) {
-                host += argv[1][i];
-            }
-            else {
-                message += argv[1][i];
-            }
-        }
-    }
-    message += " HTTP/1.1";
-    message += 13;
-    message += 10;
-    message += "Host: ";
-    message += host;
-    message += 13;
-    message += 10;
-    std::cout << message << std::endl;
-        //
-        boost::asio::io_service ios;
-        boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
-        boost::asio::ip::tcp::socket socket(ios);
-        socket.connect(endpoint);
-        boost::array<char, 128> buf;
-        std::copy(message.begin(), message.end(), buf.begin());
-        boost::system::error_code error;
-        socket.write_some(boost::asio::buffer(buf, message.size()), error);
+    size_t realsize = size * nmemb;
+    struct MemoryStruct* mem = (struct MemoryStruct*)userp;
 
+    char* ptr = (char*)realloc(mem->memory, mem->size + realsize + 1);
+    if (ptr == NULL) {
+        /* out of memory! */
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
+}
+//mover depues a un cliente.cpp
+
+int main(int argc, char* argv[])
+{
+    struct MemoryStruct chunk;
+    chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
+    chunk.size = 0;    /* no data at this point */
+
+    if (argc != 2)
+    {
+        std::cerr << "Usage: cliente <host/path/filename>" << std::endl;
+        return 1;
+    }
+    //despues sortear el argc
+    std::string data = "";
+    for (int i = 0; argv[1][i] != NULL; ++i) {
+        data += argv[1][i];
+    }
+    CURL* curl;
+    CURLcode res;
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_PORT, 80);
+        /* example.com is redirected, so we tell libcurl to follow redirection */
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl, CURLOPT_URL, data.c_str());
+        curl_easy_setopt(curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTP);
+        /* send all data to this function  */
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+
+        /* we pass our 'chunk' struct to the callback function */
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
+        //hasta aca anda bien
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+        std::cout << res << std::endl;
+        /* Check for errors */
         std::ofstream prueba;//abro/creo si no esta/ el archivo para poner lo que reciba del server
         prueba.open("prueba.txt", std::ios::trunc);//borro lo que habia antes
-
-        for (;;)
-        {
-            boost::array<char, 128> buf;
-            boost::system::error_code error;
-
-            size_t len = socket.read_some(boost::asio::buffer(buf), error);
-
-            if (error == boost::asio::error::eof)
-                break; // Connection closed cleanly by peer.
-            else if (error)
-                throw boost::system::system_error(error); // Some other error.
-
-            std::cout.write(buf.data(), len);
-            prueba.write(buf.data(), len);//guardo en el archivo
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                curl_easy_strerror(res));
         }
-        prueba.close();
-        socket.close();
+        else {
+            /*
+             * Now, our chunk.memory points to a memory block that is chunk.size
+             * bytes big and contains the remote file.
+             *
+             * Do something nice with it!
+             */
+            printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
+            for (;chunk.size>0;chunk.size--)
+            {
+                std::cout << chunk.memory[chunk.size] << std::endl;
+                prueba.write(chunk.memory, chunk.size);//guardo en el archivo
+
+            }      
+        }
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+        free(chunk.memory);
+        curl_global_cleanup();
     }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    
-    
+
+
     
     return 0;
 }
+/*HTTP/1.1 200 OK
+Date: Date (Ej: Tue, 04 Sep 2018 18:21:19 GMT)
+Location: 127.0.0.1/prueba.txt
+Cache-Control: max-age=30
+Expires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)
+Content-Length: 5
+Content-Type: text/html; charset=iso-8859-1
+prueba.txt
+*///respuesta de prueba
