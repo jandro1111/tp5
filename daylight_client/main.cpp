@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 
     if (argc != 2)
     {
-        std::cerr << "Usage: cliente <host/path/filename>" << std::endl;
-        return 1;
+        std::cerr << "Usage: cliente <host/path/filename>" << std::endl;//http://www.animemx.net/lista-de-animes/
+        return 1;//un link caido de pureba que se que trae poca info
     }
     //despues sortear el argc
     std::string data = "";
@@ -91,13 +91,8 @@ int main(int argc, char* argv[])
              *
              * Do something nice with it!
              */
-            printf("%lu bytes retrieved\n", (unsigned long)chunk.size);
-            for (;chunk.size>0;chunk.size--)
-            {
-                std::cout << chunk.memory[chunk.size] << std::endl;
-                prueba.write(chunk.memory, chunk.size);//guardo en el archivo
-
-            }      
+            printf("%lu bytes retrieved\n", (unsigned long)chunk.size);     
+            prueba.write(chunk.memory, chunk.size);//guardo en el archivo
         }
         /* always cleanup */
         curl_easy_cleanup(curl);
