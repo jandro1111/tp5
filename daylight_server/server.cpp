@@ -67,10 +67,17 @@ void AsyncDaytimeServer::start_answering()
 }
 
 
-void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code& error)
+void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code& error)//aca hacemos lo de buscar e interpretar el mensaje
 {
 	std::cout << "connection_received_cb()" << std::endl;
 	if (!error) {
+		//std::ifstream prueba("prueba/prueba.txt");//adaptar para el tipo de archivo que se busque
+	//if (prueba.is_open()) {
+	//    std::cout << "200 ok";
+	//}
+	//else {
+	//    std::cout << "404 not found";
+	//}
 		start_answering();
 		start_waiting_connection();
 	}
@@ -90,7 +97,7 @@ void AsyncDaytimeServer::response_sent_cb(const boost::system::error_code& error
 }
 
 
-std::string make_daytime_string()
+std::string make_daytime_string()//aca armamos el mensaje
 {
 #pragma warning(disable : 4996)
 	using namespace std; // For time_t, time and ctime;

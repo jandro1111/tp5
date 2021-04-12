@@ -12,22 +12,11 @@
 #include<fstream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
-
 using boost::asio::ip::tcp;
-
 
 
 int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de ejemplo
 {
-    //std::ifstream prueba("prueba.txt");//adaptar para el tipo de archivo que se busque
-    //if (prueba.is_open()) {
-    //    std::cout << "200 ok";
-    //}
-    //else {
-    //    std::cout << "404 not found";
-    //}
-    
-
     try
     {
         if (argc != 2)
@@ -38,11 +27,10 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
         //despues sortear el argc
         std::string host = "";
     int port = 80;
-    std::string message = "";
+    std::string message = "GET ";
     bool barra = false;
     for (int i = 0; argv[1][i] != NULL; ++i) {
         if ((argv[1][i] == '/')&& barra==false ) {
-            message += "/";
             barra = true;
         }
         else {
@@ -53,8 +41,15 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
                 message += argv[1][i];
             }
         }
-
     }
+    message += " HTTP/1.1";
+    message += 13;
+    message += 10;
+    message += "Host: ";
+    message += host;
+    message += 13;
+    message += 10;
+    std::cout << message << std::endl;
         //
         boost::asio::io_service ios;
         boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
@@ -91,7 +86,7 @@ int main(int argc, char* argv[])//https://github.com/jandro1111/tp5 usar esto de
         std::cerr << e.what() << std::endl;
     }
     
-
+    
     
     return 0;
 }
