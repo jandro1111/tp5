@@ -71,13 +71,7 @@ void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code&
 {
 	std::cout << "connection_received_cb()" << std::endl;
 	if (!error) {
-		//std::ifstream prueba("prueba/prueba.txt");//adaptar para el tipo de archivo que se busque
-	//if (prueba.is_open()) {
-	//    std::cout << "200 ok";
-	//}
-	//else {
-	//    std::cout << "404 not found";
-	//}
+	//aca configuramos el curl
 		start_answering();
 		start_waiting_connection();
 	}
