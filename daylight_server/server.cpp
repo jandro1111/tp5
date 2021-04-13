@@ -116,6 +116,7 @@ void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code&
 			break;
 		}
 	}
+	handler.close();
 	//en aux tengo el path a buscar
 	
 
@@ -143,6 +144,35 @@ void AsyncDaytimeServer::response_sent_cb(const boost::system::error_code& error
 std::string make_response_string(std::string aux)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
+	std::string res;
+	std::ifstream info(aux);
+	if (info.is_open()) {
+		std::cout << "lo encontre" << std::endl;//200 found
+	}
+	else {
+		std::cout << "no lo encontre" << std::endl;//404 not found
+		res += "HTTP/1.1 404 Not Found";
+		res += 13;
+		res += 10;
+		res += "Date: Date(Ej : Tue, 04 Sep 2018 18 : 21 : 19 GMT)";
+		res += 13;
+		res += 10;
+		res += "Cache - Control : public, max - age = 30";
+				res += 13;
+			res += 10;
+			res += "Expires : Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
+			res += 13;
+		res += 10;
+		res += "Content - Length : 0";
+				res += 13;
+			res += 10;
+			res += "Content - Type : text / html; charset = iso - 8859 - 1";
+				res += 13;
+			res += 10;//404
+	}
+
+
+
 	std::cout << aux << std::endl;
 	using namespace std; // For time_t, time and ctime;
 	time_t now = time(0);
