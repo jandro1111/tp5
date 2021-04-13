@@ -176,6 +176,6 @@ std::string make_response_string(std::string aux)//aca armamos el mensaje en aux
 	std::cout << aux << std::endl;
 	using namespace std; // For time_t, time and ctime;
 	time_t now = time(0);
-	return ctime(&now);
+	return res;
 }
 

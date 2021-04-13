@@ -88,6 +88,9 @@ int main(int argc, char* argv[])
             printf("%lu bytes retrieved\n", (unsigned long)chunk.size);     
             prueba.write(chunk.memory, chunk.size);//guardo en el archivo
         }
+        if (chunk.size == 0) {
+            std::cout << "file not found" << std::endl;
+        }
         /* always cleanup */
         curl_easy_cleanup(curl);
         free(chunk.memory);
