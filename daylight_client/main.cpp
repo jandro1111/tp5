@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     if (argc != 2)
     {
         std::cerr << "Usage: cliente <host/path/filename>" << std::endl;//http://www.animemx.net/lista-de-animes/
-        return 1;//un link caido de pureba que se que trae poca info
+        return 1;//un link caido de prueba que se que trae poca info
     }
     //despues sortear el argc
     std::string data = "";
@@ -79,18 +79,12 @@ int main(int argc, char* argv[])
         std::cout << res << std::endl;
         /* Check for errors */
         std::ofstream prueba;//abro/creo si no esta/ el archivo para poner lo que reciba del server
-        prueba.open("prueba.txt", std::ios::trunc);//borro lo que habia antes
+        prueba.open("respuesta.txt", std::ios::trunc);//borro lo que habia antes
         if (res != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
         }
         else {
-            /*
-             * Now, our chunk.memory points to a memory block that is chunk.size
-             * bytes big and contains the remote file.
-             *
-             * Do something nice with it!
-             */
             printf("%lu bytes retrieved\n", (unsigned long)chunk.size);     
             prueba.write(chunk.memory, chunk.size);//guardo en el archivo
         }

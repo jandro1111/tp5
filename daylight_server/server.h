@@ -17,9 +17,13 @@
 */
 
 
-
-#include <boost\asio.hpp>
-#include <string>
+#include <iostream>
+#include<fstream>
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
+#include<curl/curl.h>
+#include<string>
+using boost::asio::ip::tcp;
 class AsyncDaytimeServer
 {
 public:
@@ -30,7 +34,7 @@ public:
 
 private:
 	void start_waiting_connection();
-	void start_answering();
+	void start_answering(std::string);
 	void connection_received_cb(const boost::system::error_code& error);
 	void response_sent_cb(const boost::system::error_code& error, size_t bytes_sent);
 

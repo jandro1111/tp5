@@ -5,8 +5,7 @@
 #include <boost\bind.hpp>
 
 using boost::asio::ip::tcp;
-
-std::string make_daytime_string();
+std::string make_response_string(std::string aux);
 
 
 AsyncDaytimeServer::AsyncDaytimeServer(boost::asio::io_context& io_context)
@@ -48,10 +47,10 @@ void AsyncDaytimeServer::start_waiting_connection()
 		);
 }
 
-void AsyncDaytimeServer::start_answering()
+void AsyncDaytimeServer::start_answering(std::string aux)
 {
 	std::cout << "start_answering()" << std::endl;
-	msg = make_daytime_string();
+	msg = make_response_string(aux);
 	boost::asio::async_write(//make_daytime_string()
 		socket_,
 		boost::asio::buffer(msg),
@@ -69,10 +68,56 @@ void AsyncDaytimeServer::start_answering()
 
 void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code& error)//aca hacemos lo de buscar e interpretar el mensaje
 {
+	std::ofstream handler;//abro/creo si no esta/ el archivo para poner lo que reciba del server
+	handler.open("handler.txt", std::ios::trunc);//borro lo que habia antes
+	for (;;)//recibo lo del cliente y lo interpreto
+	{
+		boost::array<char, 128> buf;
+		boost::system::error_code error;
+
+		size_t len = socket_.read_some(boost::asio::buffer(buf), error);
+
+		if (error == boost::asio::error::eof)
+			break; // Connection closed cleanly by peer.
+		else if (error)
+			throw boost::system::system_error(error); // Some other error.
+
+		std::cout.write(buf.data(), len);
+		handler.write(buf.data(), len);//guardo en el archivo que se llama handler, para interpretar mas adelante
+		handler.close();
+		break;
+	}
+	using namespace std;
+	string nombreArchivo = "handler.txt";
+	ifstream archivo(nombreArchivo.c_str());
+	string linea;
+	string aux = "";
+	// Obtener línea de archivo, y almacenar contenido en "linea"
+	while (getline(archivo, linea)) {
+		// Lo vamos imprimiendo
+		bool fin = false;
+		bool ini = false;
+		for (int i = 0; fin == false; ++i) {//aislo el archivo a buscar
+			if (linea[i] == '/'||ini==true) {//encontre el inicio
+				aux += linea[i];
+				ini = true;
+			}
+			if (ini == true) {
+				if (linea[i] == ' ') {//encontre el final
+					fin = true;
+				}
+			}
+		}
+		if (fin == true) {
+			break;
+		}
+	}
+	//en aux tengo el path a buscar
+	
+
 	std::cout << "connection_received_cb()" << std::endl;
 	if (!error) {
-	//aca configuramos el curl
-		start_answering();
+		start_answering(aux);
 		start_waiting_connection();
 	}
 	else {
@@ -91,10 +136,12 @@ void AsyncDaytimeServer::response_sent_cb(const boost::system::error_code& error
 }
 
 
-std::string make_daytime_string()//aca armamos el mensaje
+std::string make_response_string(std::string aux)//aca armamos el mensaje
 {
 #pragma warning(disable : 4996)
+	std::cout << aux << std::endl;
 	using namespace std; // For time_t, time and ctime;
 	time_t now = time(0);
 	return ctime(&now);
 }
+
