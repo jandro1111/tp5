@@ -99,7 +99,11 @@ void AsyncDaytimeServer::connection_received_cb(const boost::system::error_code&
 		bool ini = false;
 		for (int i = 0; fin == false; ++i) {//aislo el archivo a buscar
 			if (linea[i] == '/'||ini==true) {//encontre el inicio
-				aux += linea[i];
+				if (ini == false) {
+				}
+				else {
+					aux += linea[i];
+				}
 				ini = true;
 			}
 			if (ini == true) {
@@ -136,7 +140,7 @@ void AsyncDaytimeServer::response_sent_cb(const boost::system::error_code& error
 }
 
 
-std::string make_response_string(std::string aux)//aca armamos el mensaje
+std::string make_response_string(std::string aux)//aca armamos el mensaje en aux tengo el path a buscar
 {
 #pragma warning(disable : 4996)
 	std::cout << aux << std::endl;
