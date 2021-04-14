@@ -1,4 +1,4 @@
-GET /algo.txt HTTP/1.1
+GET /google.html HTTP/1.1
 Host: 127.0.0.1
 Accept: */*
 

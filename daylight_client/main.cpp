@@ -106,7 +106,7 @@ Date: Date (Ej: Tue, 04 Sep 2018 18:21:19 GMT)
 Location: 127.0.0.1/prueba.txt
 Cache-Control: max-age=30
 Expires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)
-Content-Length: 5
+Content-Length: 10
 Content-Type: text/html; charset=iso-8859-1
 prueba.txt
 *///respuesta de prueba

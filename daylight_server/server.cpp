@@ -146,29 +146,44 @@ std::string make_response_string(std::string aux)//aca armamos el mensaje en aux
 #pragma warning(disable : 4996)
 	std::string res;
 	std::ifstream info(aux);
+	std::ifstream archivo(aux.c_str());
+	std::string linea;
 	if (info.is_open()) {
 		std::cout << "lo encontre" << std::endl;//200 found
+		res += "HTTP/1.1 200 OK";
+		res += "\r\n";
+		res += "Date: Date(Ej : Tue, 04 Sep 2018 18 : 21 : 19 GMT)";
+		res += "\r\n";
+		res += "Cache-Control : public, max - age = 30";
+		res += "\r\n";
+		res += "Expires:Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
+		res += "\r\n";
+		res += "Content-Length : 1";
+		res += "\r\n";
+		res += "Content-Type : text / html; charset = iso - 8859 - 1";
+		res += "\r\n";
+		res += "\r\n";
+		while (getline(archivo, linea)) {
+			// Lo vamos imprimiendo
+			res += linea;
+			}
+		res += "\r\n";
+		res += "\r\n";
 	}
 	else {
 		std::cout << "no lo encontre" << std::endl;//404 not found
 		res += "HTTP/1.1 404 Not Found";
-		res += 13;
-		res += 10;
+		res += "\r\n";
 		res += "Date: Date(Ej : Tue, 04 Sep 2018 18 : 21 : 19 GMT)";
-		res += 13;
-		res += 10;
+		res += "\r\n";
 		res += "Cache - Control : public, max - age = 30";
-				res += 13;
-			res += 10;
-			res += "Expires : Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
-			res += 13;
-		res += 10;
+		res += "\r\n";
+		res += "Expires : Date + 30s(Ej : Tue, 04 Sep 2018 18 : 21 : 49 GMT)";
+		res += "\r\n";
 		res += "Content - Length : 0";
-				res += 13;
-			res += 10;
-			res += "Content - Type : text / html; charset = iso - 8859 - 1";
-				res += 13;
-			res += 10;//404
+		res += "\r\n";
+		res += "Content - Type : text / html; charset = iso - 8859 - 1";
+		res += "\r\n";//404
 	}
 
 
@@ -179,3 +194,14 @@ std::string make_response_string(std::string aux)//aca armamos el mensaje en aux
 	return res;
 }
 
+/*
+HTTP/1.1 200 OK
+Date: Date (Ej: Tue, 04 Sep 2018 18:21:19 GMT)
+Location: 127.0.0.1/path/filename
+Cache-Control: max-age=30
+Expires: Date + 30s (Ej: Tue, 04 Sep 2018 18:21:49 GMT)
+Content-Length: 1
+Content-Type: text/html; charset=iso-8859-1
+a
+
+*/
